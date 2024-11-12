@@ -2,6 +2,7 @@ package org.example.ArrLst;
 
 
 import java.io.UncheckedIOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.BiFunction;
 
@@ -13,7 +14,7 @@ import java.util.function.BiFunction;
  * <br></br>
  * Without checking the getValue function may return <strong>null</strong>
  */
-public class ArrList<E> {
+public class ArrList<E> implements Comparable<E>{
 
   /**
    * Default capacity.
@@ -55,14 +56,15 @@ public class ArrList<E> {
 
   public ArrList() {
     this.arr = new Object[DEFAULT_CAPACITY];
+    this.length = DEFAULT_CAPACITY;
   }
 
   public ArrList(int initialCapacity) {
     if (initialCapacity == 0) {
       this.arr = new Object[EMPTY_CAPACITY];
     } else if (initialCapacity > 0) {
-      length = initialCapacity;
-      this.arr = new Object[length];
+      this.length = initialCapacity;
+      this.arr = new Object[this.length];
     } else {
       throw new IllegalArgumentException("Capacity can not be a negative number!");
     }
@@ -72,10 +74,18 @@ public class ArrList<E> {
     if (collection.isEmpty()) {
       this.arr = new Object[EMPTY_CAPACITY];
     } else {
-      length = collection.size();
+      this.length = collection.size();
       this.arr = new Object[length];
       collection.forEach(this::add);
     }
+  }
+
+  /**
+   * Get the size of the array.
+   * @return - size of the array with elements
+   */
+  public int size() {
+    return tail;
   }
 
   /**
@@ -84,13 +94,13 @@ public class ArrList<E> {
    * @param element - element of type E.
    */
   public void add(E element) {
-    if (tail == length - 1) {
+    if (this.tail == this.length - 1) {
       grow();
     }
     // Increment tail.
-    tail++;
+    this.tail++;
     // Add element
-    arr[tail] = element;
+    this.arr[this.tail] = element;
   }
 
   public void addAll(Collection<? extends E> collection) {
@@ -103,10 +113,10 @@ public class ArrList<E> {
    */
   @SuppressWarnings("unchecked")
   public ErrorPair<E, Errors> get() {
-    if (tail == -1) {
+    if (this.tail == -1) {
       return new ErrorPair<>(null, Errors.NULL_VALUE);
     } else {
-      return new ErrorPair<>((E) arr[tail], Errors.NO_ERROR);
+      return new ErrorPair<>((E) this.arr[this.tail], Errors.NO_ERROR);
     }
   }
 
@@ -117,8 +127,8 @@ public class ArrList<E> {
    * @return ErrorPair for <strong>both success and error</strong>.
    */
   public ErrorPair<E, Errors> set(E element, int index) {
-    if (index >= 0 && index <= tail) {
-      arr[index] = element;
+    if (index >= 0 && index <= this.tail) {
+      this.arr[index] = element;
       return new ErrorPair<>(null, Errors.NO_ERROR);
     } else {
       return getError(Errors.INDEX_OUT_OF_BOUNDS);
@@ -132,8 +142,8 @@ public class ArrList<E> {
    */
   @SuppressWarnings("unchecked")
   public ErrorPair<E, Errors> getAt(int index) {
-    if (index >= 0 && index <= tail) {
-      return new ErrorPair<>((E) arr[index], Errors.NO_ERROR);
+    if (index >= 0 && index <= this.tail) {
+      return new ErrorPair<>((E) this.arr[index], Errors.NO_ERROR);
     } else {
       return getError(Errors.INDEX_OUT_OF_BOUNDS);
     }
@@ -141,8 +151,8 @@ public class ArrList<E> {
 
   @SuppressWarnings("unchecked")
   public ErrorPair<E, Errors> getFirst() {
-    if (tail != -1) {
-      return new ErrorPair<>((E) arr[0], Errors.NO_ERROR);
+    if (this.tail != -1) {
+      return new ErrorPair<>((E) this.arr[0], Errors.NO_ERROR);
     } else {
       return getError(Errors.NO_SUCH_ELEMENT);
     }
@@ -150,8 +160,8 @@ public class ArrList<E> {
 
   @SuppressWarnings("unchecked")
   public ErrorPair<E, Errors> getLast() {
-    if (tail != -1) {
-      return new ErrorPair<>((E) arr[tail], Errors.NO_ERROR);
+    if (this.tail != -1) {
+      return new ErrorPair<>((E) this.arr[this.tail], Errors.NO_ERROR);
     } else {
       return getError(Errors.NO_SUCH_ELEMENT);
     }
@@ -163,17 +173,22 @@ public class ArrList<E> {
    */
   @SuppressWarnings("unchecked")
   public ErrorPair<E, Errors> remove() {
-    if (tail == -1) {
+    if (this.tail == -1) {
       return getError(Errors.NULL_VALUE);
     } else {
-      return new ErrorPair<>((E) arr[tail--], Errors.NO_ERROR);
+      return new ErrorPair<>((E) this.arr[this.tail--], Errors.NO_ERROR);
     }
   }
 
+  @SuppressWarnings("unchecked")
   public ErrorPair<E, Errors> removeAt(int index) {
-    if (index >= 0 && index <= tail) {
-      // TODO finish the method
-      return null;
+    if (index >= 0 && index <= this.tail) {
+      ErrorPair<E, Errors> pair = new ErrorPair<>((E) this.arr[index], Errors.NO_ERROR);
+      // Write null to the index position
+      this.arr[index] = null;
+      // Regenerate the array to make it continuous again. Doesn't change the length of the array.
+      regenerate(index);
+      return pair;
     } else {
       return getError(Errors.INDEX_OUT_OF_BOUNDS);
     }
@@ -186,26 +201,33 @@ public class ArrList<E> {
    * @param growthRate double that specifies how much should array grow when tail is equal length.
    */
   public void setGrowthRate(double growthRate) {
-    growingBy = growthRate;
+    this.growingBy = growthRate;
   }
 
   /**
    * Private method that grows array with specified growth rate.
    */
   private void grow() {
-    length = ((int) (growingBy * length)) + 1;
-    arr = copyArray.apply(arr, length);
+    this.length = ((int) (this.growingBy * this.length)) + 1;
+    this.arr = copyArray.apply(this.arr, this.length);
   }
 
   /**
    * Function to regenerate the array after an element removal.
    */
-  private void regenerate() {
-    return;
+  private void regenerate(int index) {
+    if (index == this.tail) {
+      return;
+    } else {
+      Object[] newArr = new Object[length];
+      System.arraycopy(this.arr, 0, newArr, 0, index);
+      System.arraycopy(this.arr, index + 1, newArr, index, this.length - 1);
+      this.arr = newArr;
+    }
   }
 
   public Boolean isEmpty() {
-    return tail == -1;
+    return this.tail == -1;
   }
 
   private ErrorPair<E, Errors> getError(Errors err) {
@@ -217,7 +239,14 @@ public class ArrList<E> {
    */
   private static final BiFunction<Object[], Integer, Object[]> copyArray = (source, newSize) -> {
     Object[] newArray = new Object[newSize];
-    System.arraycopy(source, 0, newArray, 0, source.length);
+    System.arraycopy(source, 0, newArray, 0, source.length - 1);
     return newArray;
   };
+
+  @Override
+  public int compareTo(E o) {
+    // TODO think about comparing elements inside of the array.
+    // TODO write a quicksort for it.
+    return 1;
+  }
 }
