@@ -241,4 +241,17 @@ class ArrListTest {
     arrList.sort(Comparator.naturalOrder());
     assert arrList.getAt(0).getValue() == 'a';
   }
+
+  @Test
+  void clean() {
+    ArrList<Character> arrList = new ArrList<>(
+        IntStream.iterate('a', n -> n + 1).limit(26).mapToObj(c -> (char) c).toList()
+    );
+    assert arrList.get().getValue() != null;
+    assert !arrList.isEmpty();
+
+    arrList.clean();
+    assert arrList.get().getValue() == null;
+    assert arrList.isEmpty();
+  }
 }

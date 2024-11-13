@@ -319,14 +319,37 @@ public class ArrList<E>
     Iterable.super.forEach(action);
   }
 
+  /**
+   * Naive sort method that uses hash of elements
+   */
   public void hashSort() {
     if (tail >= 2) {
       HashSort.quicksort(arr, 0, this.tail);
     }
   }
 
+  /**
+   * Quicksort method that uses Comparator
+   * @param comparator - a valid comparator
+   */
   public void sort(Comparator<? super E> comparator) {
     Sort<E> sorter = new Sort<>(comparator);
     sorter.sort(this);
+  }
+
+  /**
+   * Remove all elements from the array.
+   */
+  public void clean() {
+    if (tail == -1) {
+      return;
+    }
+
+    int length = tail;
+    for (int i = length; i >= 0; i--) {
+      arr[i] = null;
+      // decrement the tail
+      tail--;
+    }
   }
 }
