@@ -7,9 +7,8 @@ import static org.example.ArrLst.Errors.*;
  * Class for ErrorPairs, like in Go, ErrorPair consists of an object with value and possible Error,
  * if no Error is present it has 0.
  * @param <K> - Value part of ErrorPair
- * @param <Errors> - Error part of ErrorPair
  */
-public class ErrorPair<K, Errors> {
+public class ErrorPair<K> {
 
   /**
    * Value part of ErrorPair

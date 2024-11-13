@@ -4,7 +4,7 @@ package org.example.ArrLst;
  * Naive quicksort class
  * Compares objects based on their hash value.
  */
-public class HashSort {
+class HashSort {
 
   /**
    * Quicksort function, does in place array sorting, using hash for compartment
