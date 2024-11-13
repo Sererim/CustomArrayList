@@ -2,6 +2,7 @@ package org.example.ArrLst;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -62,7 +63,7 @@ class ArrListTest {
     assert errorPair.getError().ordinal() != 0;
     assert errorPair.getValue() == null;
 
-    arrList.addAll( Stream.iterate("Ello, Orld!", s -> s + "\n").limit(10).toList() );
+    arrList.addAll(Stream.iterate("Ello, Orld!", s -> s + "\n").limit(10).toList());
     errorPair = arrList.getAt(9);
     assert errorPair.getError().ordinal() == 0;
     assert !errorPair.getValue().isEmpty();
@@ -138,7 +139,7 @@ class ArrListTest {
     ArrList<Integer> arrList = new ArrList<>();
     assert arrList.size() == 0;
 
-    arrList.addAll( Stream.iterate(0, n -> n + 10).limit(13).toList() );
+    arrList.addAll(Stream.iterate(0, n -> n + 10).limit(13).toList());
     assert arrList.size() == 13;
   }
 
@@ -147,7 +148,7 @@ class ArrListTest {
     ArrList<Integer> arrList = new ArrList<>();
     assert arrList.getLength() == 10;
 
-    arrList.addAll( Stream.iterate(0, n -> n + 10).limit(13).toList() );
+    arrList.addAll(Stream.iterate(0, n -> n + 10).limit(13).toList());
     assert arrList.getLength() == 16;
   }
 
@@ -172,14 +173,14 @@ class ArrListTest {
     ArrList<Integer> arrList = new ArrList<>();
     arrList.setGrowthRate(2.5D);
 
-    Stream.iterate(0, n -> n + 1).limit(16).forEach( arrList::add );
+    Stream.iterate(0, n -> n + 1).limit(16).forEach(arrList::add);
     assert arrList.getLength() == 26;
   }
 
   @Test
   void testClone() {
     ArrList<Integer> arrList = new ArrList<>();
-    Stream.iterate(0, n -> n + 1).limit(16).forEach( arrList::add );
+    Stream.iterate(0, n -> n + 1).limit(16).forEach(arrList::add);
 
     ArrList<Integer> cloneList = arrList.clone();
     assert !cloneList.equals(arrList);
@@ -192,7 +193,7 @@ class ArrListTest {
   @Test
   void testRegenerate() {
     ArrList<Integer> arrList = new ArrList<>();
-    Stream.iterate(0, n -> n + 1).limit(16).forEach( arrList::add );
+    Stream.iterate(0, n -> n + 1).limit(16).forEach(arrList::add);
 
     ErrorPair<Integer> errorPair = arrList.removeAt(12);
     assert errorPair.getValue() == 12;
@@ -219,5 +220,25 @@ class ArrListTest {
     assert errorPair.getValue() == null;
     // Because we can't remove the 11th element so size is still 12.
     assert arrList.size() == 12;
+  }
+
+  @Test
+  void hashSort() {
+    ArrList<Integer> arrList = new ArrList<>(Stream.iterate(16, n -> n - 1).limit(17).toList());
+
+    // Test hashSort
+    assert arrList.getAt(0).getValue() == 16;
+    arrList.hashSort();
+    assert arrList.getAt(0).getValue() == 0;
+  }
+
+  @Test
+  void sort() {
+    ArrList<Character> arrList = new ArrList<>(
+        IntStream.iterate('z', n -> n - 1).limit(26).mapToObj(c -> (char) c).toList()
+    );
+    assert arrList.getAt(0).getValue() == 'z';
+    arrList.sort(Comparator.naturalOrder());
+    assert arrList.getAt(0).getValue() == 'a';
   }
 }

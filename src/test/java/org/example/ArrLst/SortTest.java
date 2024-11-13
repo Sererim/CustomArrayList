@@ -26,4 +26,27 @@ public class SortTest {
 
     assert arrList.getAt(0).getValue() == 0;
   }
+
+  @Test
+  void hashSorting() {
+    Object[] array = new Object[10];
+
+    for (int i = 0; i < array.length; i++) {
+      array[i] = 10 - i;
+    }
+
+    HashSort.quicksort(array, 0, array.length - 1);
+  }
+
+  @Test
+  void Sorting() {
+    ArrList<Integer> arrList = new ArrList<>();
+    Stream.iterate(12, n -> n - 1).limit(13).forEach( arrList::add );
+
+    Sort<Integer> integerSort = new Sort<>(Comparator.naturalOrder());
+    assert arrList.getAt(0).getValue() == 12;
+    integerSort.sort(arrList);
+    assert arrList.getAt(0).getValue() == 0;
+  }
+
 }

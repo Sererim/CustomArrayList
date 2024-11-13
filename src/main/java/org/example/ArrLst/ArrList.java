@@ -324,4 +324,9 @@ public class ArrList<E>
       HashSort.quicksort(arr, 0, this.tail);
     }
   }
+
+  public void sort(Comparator<? super E> comparator) {
+    Sort<E> sorter = new Sort<>(comparator);
+    sorter.sort(this);
+  }
 }
